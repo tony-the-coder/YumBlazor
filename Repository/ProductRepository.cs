@@ -8,6 +8,7 @@ namespace YumBlazor.Repository
     {
         private readonly ApplicationDbContext _db;
 
+
         public ProductRepository(ApplicationDbContext db)
         {
             _db = db;
@@ -18,7 +19,7 @@ namespace YumBlazor.Repository
             await _db.SaveChangesAsync();
             return obj;
         }
-     
+        //TODO: #1 Need to check and see why deleting the image is not working so I undid it all 
         public async Task<bool> DeleteAsync(int id)
         {
             var obj = await _db.Product.FirstOrDefaultAsync(u => u.ID == id);
@@ -42,7 +43,7 @@ namespace YumBlazor.Repository
         
         public async Task<IEnumerable<Product>> GetAllAsync()
         {
-           return await _db.Product.ToListAsync();
+           return await _db.Product.Include(u=>u.Category).ToListAsync();
         }
         public async Task<Product> UpdateAsync(Product obj)
         {
