@@ -1,6 +1,22 @@
 ﻿@inherits LayoutComponentBase
+@using YumBlazor.Utility
+
+
 
 <div class="page">
+    @*A simple example on how AuthorizedView works which is how permissions 
+        work in Blazor. 
+    *@
+@* <AuthorizeView> *@
+@*     Any authorized user *@
+@* </AuthorizeView> *@
+@*     <AuthorizeView Roles="@SD.Role_Admin"> *@
+@*         Admin *@
+@*     </AuthorizeView> *@
+@*     <AuthorizeView Roles="@SD.Role_Customer"> *@
+@*         CUSTOMER *@
+@*     </AuthorizeView> *@
+
     <div class="sidebar">
         <NavMenu />
     </div>
