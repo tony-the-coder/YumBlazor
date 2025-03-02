@@ -1,5 +1,6 @@
 ﻿@page "/cart"
 @using Microsoft.AspNetCore.Authorization
+@using System.Globalization
 @inject AuthenticationStateProvider _AuthenticationStateProvider
 @inject IShoppingCartRepository _cartRepository
 @attribute [Authorize]
@@ -25,7 +26,8 @@ else
 				{
 					<div class="d-flex p-2 m-2">
 						<div class="card flex-row w-100">
-						<img class="card-img-left" style="width: 120px;">
+							@*Add the image by calling if with the ImageUrl*@
+						<img class="card-img-left" style="width: 120px;" src="@(cartItem.Product.ImageUrl ?? "/images/default.png")">
 						<div class="card-body">
 							<div class="d-flex justify-content-between align-items-center">
 								<h4 class="">
@@ -50,7 +52,7 @@ else
 							<div class="flex-fill">
 								<h4 class="text-danger">
 									@*This gets the current price of the items in the cart*@
-                                        @((cartItem.Product.Price * cartItem.Count).ToString("C", CultureInfo.GetCultureInfo("en-us")))))
+                                        @((cartItem.Product.Price * cartItem.Count).ToString("C", CultureInfo.GetCultureInfo("en-us")))
 								</h4>
 							</div>
 							<div class="d-flex justify-content-between align-items-center">
@@ -59,7 +61,10 @@ else
 										<i class="bi bi-dash-circle-fill btn text-secondary"></i>
 									</span>
 									<span class="ml-1 me-1">
-										<b class="lead">--Count--</b>
+										@*Displays the count of the product.*@
+										<b class="lead">
+											@cartItem.Count
+										</b>
 									</span>
 									<span>
 										<i class="bi bi-plus-circle-fill btn text-secondary"></i>
