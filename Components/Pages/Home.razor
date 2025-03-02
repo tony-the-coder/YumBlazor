@@ -3,7 +3,7 @@
 @inject AuthenticationStateProvider _AuthenticationStateProvider
 @inject IJSRuntime _js
 @inject NavigationManager _NavigationManager
-@inject YumBlazor.Repository.IRepository.IProductRepository _productRepository
+@inject IProductRepository _productRepository
 @inject ICategoryRepository _categoryRepository
 @inject IShoppingCartRepository _cartRepository
 
@@ -174,11 +174,11 @@ else
     {
         var authState = await _AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        var authenticated = user.Identity.IsAuthenticated;
+        var authenticated = user.Identity is not null && user.Identity.IsAuthenticated;
         //Check if the user is authenticated
         if (!authenticated)
         {
-            _NavigationManager.NavigateTo("/Account/Login");
+            _NavigationManager.NavigateTo("Account/Login", true);
         }
         //Add the product to the cart
         else
