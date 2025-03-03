@@ -4,6 +4,9 @@
 @using YumBlazor.Utility
 @inject AuthenticationStateProvider _AuthenticationStateProvider
 @inject IShoppingCartRepository _cartRepository
+@inject IOrderRepository _orderRepository
+@inject NavigationManager _navigationManger
+
 @attribute [Authorize]
 
 @if (IsProcessing)
@@ -186,7 +189,7 @@ else
     private async Task LoadCart()
     {
         // Loads the shopping cart items from the database if a user is logged in
-       
+
         ShoppingCarts = await _cartRepository.GetAllAsync(OrderHeader.UserID);
 
         OrderHeader.OrderTotal = 0;
@@ -198,12 +201,12 @@ else
             TotalItems += cart.Count;
         }
         OrderHeader.OrderTotal = Math.Round(OrderHeader.OrderTotal, 2);
-        
+
     }
 
     private async Task UpdateCartItem(int productId, int updateBy)
     {
-       
+
         // var authenticated = user.Identity is not null && user.Identity.IsAuthenticated;
         //Check if the user is authenticated
 
@@ -215,6 +218,12 @@ else
 
     private async Task ProcessOrderCreation()
     {
-        
+        IsProcessing = true;
+        await Task.Yield();
+        OrderHeader.OrderDetails = SD.ConvertShoppingCartListToOrderDetails(ShoppingCarts.ToList());
+
+        await _orderRepository.CreateAsync(OrderHeader);
+        _navigationManger.NavigateTo($"/order/confirmation/{OrderHeader.ID}");
+
     }
 }
