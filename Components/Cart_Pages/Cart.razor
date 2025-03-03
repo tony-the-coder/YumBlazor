@@ -13,129 +13,140 @@
 }
 else
 {
-    <div class="row w-100">
-        <div class="col-lg-6 col-12">
-            <div class="container p-4 m-2">
-                <h4 class="text-center text-success display-6">
-                    Cart Summary
-                </h4>
 
-                @* Adding the items from the shopping cart so it can be displayed in the cart page *@
+    @if(ShoppingCarts.Any())
+    {
 
-                @foreach (var cartItem in ShoppingCarts)
-                {
-                    <div class="d-flex p-2 m-2">
-                        <div class="card flex-row w-100">
-                            @*Add the image by calling if with the ImageUrl*@
-                            <img class="card-img-left" style="width: 120px;" src="@(cartItem.Product.ImageUrl ?? "/images/default.png")">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="">
-                                        @*Adding the name of the product from the list and make
+        <div class="row w-100">
+            <div class="col-lg-6 col-12">
+                <div class="container p-4 m-2">
+                    <h4 class="text-center text-success display-6">
+                        Cart Summary
+                    </h4>
+
+                    @* Adding the items from the shopping cart so it can be displayed in the cart page *@
+
+                    @foreach (var cartItem in ShoppingCarts)
+                    {
+                        <div class="d-flex p-2 m-2">
+                            <div class="card flex-row w-100">
+                                @*Add the image by calling if with the ImageUrl*@
+                                <img class="card-img-left" style="width: 120px;" src="@(cartItem.Product.ImageUrl ?? "/images/default.png")">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h4 class="">
+                                            @*Adding the name of the product from the list and make
 										sure it is populated by checking the cartItem.Product.Name
 										is set up properly in ShoppingCartRepository
 									*@
 
-                                        @cartItem.Product.Name
-                                    </h4>
-                                    <h4>
-                                        @*Adding the price of the product from the list and make
+                                            @cartItem.Product.Name
+                                        </h4>
+                                        <h4>
+                                            @*Adding the price of the product from the list and make
 										sure it is populated by checking the cartItem.Product.Price
 										is set up properly in ShoppingCartRepository
 									###
 										Sidenote: The ToString("C") is used to format the price but 
 										it is not necessary and TODO: verify why CultureInfo is not working
 										*@
-                                        @cartItem.Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-us"))
-                                    </h4>
-                                </div>
-                                <div class="flex-fill">
-                                    <h4 class="text-danger">
-                                        @*This gets the current price of the items in the cart*@
-                                        @((cartItem.Product.Price * cartItem.Count).ToString("C", CultureInfo.GetCultureInfo("en-us")))
-                                    </h4>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex justify-content-between g-0">
-                                        @*Review exactly how UpdateCartItem is working.*@
-                                        <span @onclick="() =>UpdateCartItem(cartItem.ProductID, -1)">
-                                            <i class="bi bi-dash-circle-fill btn text-secondary"></i>
-                                        </span>
-                                        <span class="ml-1 me-1">
-                                            @*Displays the count of the product.*@
-                                            <b class="lead">
-                                                @cartItem.Count
-                                            </b>
-                                        </span>
-                                        <span @onclick="() =>UpdateCartItem(cartItem.ProductID, 1)">
-                                            <i class="bi bi-plus-circle-fill btn text-secondary"></i>
-                                        </span>
+                                            @cartItem.Product.Price.ToString("C", CultureInfo.GetCultureInfo("en-us"))
+                                        </h4>
                                     </div>
+                                    <div class="flex-fill">
+                                        <h4 class="text-danger">
+                                            @*This gets the current price of the items in the cart*@
+                                            @((cartItem.Product.Price * cartItem.Count).ToString("C", CultureInfo.GetCultureInfo("en-us")))
+                                        </h4>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex justify-content-between g-0">
+                                            @*Review exactly how UpdateCartItem is working.*@
+                                            <span @onclick="() =>UpdateCartItem(cartItem.ProductID, -1)">
+                                                <i class="bi bi-dash-circle-fill btn text-secondary"></i>
+                                            </span>
+                                            <span class="ml-1 me-1">
+                                                @*Displays the count of the product.*@
+                                                <b class="lead">
+                                                    @cartItem.Count
+                                                </b>
+                                            </span>
+                                            <span @onclick="() =>UpdateCartItem(cartItem.ProductID, 1)">
+                                                <i class="bi bi-plus-circle-fill btn text-secondary"></i>
+                                            </span>
+                                        </div>
 
-                                    @* I am using an abusrdly high number to remove the item from the cart because *@
-                                    @* ShoppingCartRepository does not let the items go below 0; however,
+                                        @* I am using an abusrdly high number to remove the item from the cart because *@
+                                        @* ShoppingCartRepository does not let the items go below 0; however,
 											if a user can enter the desired quantity, it will be easier to remove the item by using 
 											a different method.*@
 
-                                    <button class="btn btn-danger"
-                                    @onclick="() =>UpdateCartItem(cartItem.ProductID, -100000000)">
-                                        Remove
-                                    </button>
+                                        <button class="btn btn-danger"
+                                        @onclick="() =>UpdateCartItem(cartItem.ProductID, -100000000)">
+                                            Remove
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
-        </div>
-        <div class="col-lg-6 col-12 p-4">
-            <div class="card">
-                <div class="card-header text-success text-center display-6">
-                    Pickup Details
+                    }
                 </div>
-                <EditForm Model="OrderHeader" FormName="CartForm" OnValidSubmit="ProcessOrderCreation">
-                    <DataAnnotationsValidator />
-                    <div class="card-body">
-                        @* Start of the form on the order page *@
-
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <InputText type="text" @bind-Value="OrderHeader.Name" class="form-control" />
-                                <ValidationMessage For="@(() => OrderHeader.Name)" />
-                            </div>
-                            <div class="form-group">
-                                <label>Email</label>
-                                <InputText type="text" @bind-Value="OrderHeader.Email" class="form-control" />
-                                <ValidationMessage For="@(() => OrderHeader.Email)" />
-                            </div>
-                            <div class="form-group">
-                                <label>Phone</label>
-                                <InputText type="text" @bind-Value="OrderHeader.PhoneNumber " class="form-control" />
-                                <ValidationMessage For="@(() => OrderHeader.PhoneNumber)" />
-                            </div>
-                        </div>
-
-                        <div class="card mt-4 bg-light">
-                            <div class="card-body">
-                                <h4>
-                                    Grand Total: @OrderHeader.OrderTotal.ToString("C", CultureInfo.GetCultureInfo("en-us"))
-                                </h4>
-                                <h4>
-                                    No. of Items: @TotalItems
-                                </h4>
-                            </div>
-
-                        </div>
+            </div>
+            <div class="col-lg-6 col-12 p-4">
+                <div class="card">
+                    <div class="card-header text-success text-center display-6">
+                        Pickup Details
                     </div>
+                    <EditForm Model="OrderHeader" FormName="CartForm" OnValidSubmit="ProcessOrderCreation">
+                        <DataAnnotationsValidator />
+                        <div class="card-body">
+                            @* Start of the form on the order page *@
 
-                    <button type="submit" class="btn btn-success m-4">
-                        Looks Good? Place Order!
-                    </button>
-                </EditForm>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <InputText type="text" @bind-Value="OrderHeader.Name" class="form-control" />
+                                    <ValidationMessage For="@(() => OrderHeader.Name)" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <InputText type="text" @bind-Value="OrderHeader.Email" class="form-control" />
+                                    <ValidationMessage For="@(() => OrderHeader.Email)" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Phone</label>
+                                    <InputText type="text" @bind-Value="OrderHeader.PhoneNumber " class="form-control" />
+                                    <ValidationMessage For="@(() => OrderHeader.PhoneNumber)" />
+                                </div>
+                            </div>
+
+                            <div class="card mt-4 bg-light">
+                                <div class="card-body">
+                                    <h4>
+                                        Grand Total: @OrderHeader.OrderTotal.ToString("C", CultureInfo.GetCultureInfo("en-us"))
+                                    </h4>
+                                    <h4>
+                                        No. of Items: @TotalItems
+                                    </h4>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success m-4">
+                            Looks Good? Place Order!
+                        </button>
+                    </EditForm>
+                </div>
             </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="position-absolute w-100 vh-100 d-flex flex-column align-items-center bg-white justify-content-center">
+            <h1 class="text-danger">No items in the cart</h1>
+        </div>
+    }
 }
 
 @code {
@@ -150,11 +161,15 @@ else
 
     [SupplyParameterFromForm]
     public OrderHeader OrderHeader { get; set; } = new OrderHeader();
-
     private int TotalItems { get; set; } = 0;
 
-
-
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await _AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        OrderHeader.Email = user.FindFirst(u => u.Type.Contains("email"))?.Value;
+        OrderHeader.UserID = user.FindFirst(u => u.Type.Contains("nameidentifier"))?.Value;
+    }
     @*Load the products and categories on first render*@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -169,21 +184,29 @@ else
     private async Task LoadCart()
     {
         // Loads the shopping cart items from the database if a user is logged in
-        var authState = await _AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        ShoppingCarts = await _cartRepository.GetAllAsync(user.FindFirst(u => u.Type.Contains("nameidentifier"))?.Value);
+       
+        ShoppingCarts = await _cartRepository.GetAllAsync(OrderHeader.UserID);
 
+        OrderHeader.OrderTotal = 0;
+        TotalItems = 0;
+        foreach (var cart in ShoppingCarts)
+        {
+            // Calculate the total number of items in the cart and the total price
+            OrderHeader.OrderTotal += (Convert.ToDouble(cart.Product.Price) * cart.Count);
+            TotalItems += cart.Count;
+        }
+        OrderHeader.OrderTotal = Math.Round(OrderHeader.OrderTotal, 2);
+        
     }
 
     private async Task UpdateCartItem(int productId, int updateBy)
     {
-        var authState = await _AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        var authenticated = user.Identity is not null && user.Identity.IsAuthenticated;
+       
+        // var authenticated = user.Identity is not null && user.Identity.IsAuthenticated;
         //Check if the user is authenticated
 
         var result = await
-        _cartRepository.UpdateCartAsync(user.FindFirst(u => u.Type.Contains("nameidentifier"))?.Value, productId, updateBy);
+        _cartRepository.UpdateCartAsync(OrderHeader.UserID, productId, updateBy);
 
         await LoadCart();
     }
