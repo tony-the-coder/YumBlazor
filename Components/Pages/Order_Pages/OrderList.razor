@@ -1,10 +1,13 @@
 ﻿@page "/order/list"
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@using YumBlazor.Utility
 @inject IOrderRepository _orderRepository
 @inject NavigationManager _navigationManager
-<h3>OrderList</h3>
+@attribute [Authorize]
 @if (IsProcessing)
 {
-    <div class="position-absolute w-75 h-75 d-flex flex-column align-items-center bg-white justify-content-center">
+    <div class="position-absolute w-100 vh-100 d-flex flex-column align-items-center bg-white justify-content-center">
         <img src="/images/loading.gif" alt="loading" />"
     </div>
 }
@@ -20,7 +23,7 @@ else
             </div>
         </div>
         <div class="card-body p-4">
-            
+
             @if (OrderHeaders.Any())
             {
                 <table class="table table-bordered table-striped">
@@ -53,7 +56,7 @@ else
                                     <a href="@($"order/details/{obj.ID}")" class="btn btn-sm btn-primary">
                                         <i class="bi bi-pencil-square"></i> Details
                                     </a>
-                                    
+
                                 </td>
                             </tr>
                         }
@@ -74,7 +77,14 @@ else
 @code {
     private bool IsProcessing { get; set; } = true;
     private IEnumerable<OrderHeader> OrderHeaders { get; set; } = new List<OrderHeader>();
-   
+
+    private bool? IsAdmin { get; set; }
+    private string? UserId { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState { get; set; }
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,12 +102,37 @@ else
         // return base.OnAfterRenderAsync(firstRender);
     }
 
+    //This method is used to load the order header and get Ids of the user 
+    // and check if the user is an admin and have access to all orders, and if not only return the user's info.
     private async Task LoadOrderHeader()
     {
+        IsProcessing = true;
+        StateHasChanged();
+        await CheckAuthorization(); 
+        @if (IsAdmin == true)
+        {
+            OrderHeaders = await _orderRepository.GetAllAsync();
+        }
+        else
+        {
+            OrderHeaders = await _orderRepository.GetAllAsync(UserId);
+        }
 
-        OrderHeaders = await _orderRepository.GetAllAsync();
+        
         // Load Categories
+        IsProcessing = false;
     }
 
+    private async Task CheckAuthorization()
+    {
 
+        if(AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState?.User;
+
+            IsAdmin = user?.IsInRole(SD.Role_Admin);
+            UserId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+    }
 }
