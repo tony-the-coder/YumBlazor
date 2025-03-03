@@ -41,8 +41,22 @@ else
                     </div>
 
                     <div class="form-floating py-3 col-12">
-                        <InputText @bind-Value="Product.SpecialTag" class="form-control" id="SpecialTag" placeholder="" />
-                        <label for="SpecialTag">Special Tag</label>
+                        @* Inserting a rich text editor for the description *@
+                        
+                        <RadzenHtmlEditor @bind-Value=@Product.Description style="height: 450px;">
+                            @* <RadzenHtmlEditorUndo /> *@
+                            @* <RadzenHtmlEditorRedo /> *@
+                            @* <RadzenHtmlEditorSeparator /> *@
+                            @* <RadzenHtmlEditorBold /> *@
+                            @* <RadzenHtmlEditorItalic /> *@
+                            @* <RadzenHtmlEditorUnderline /> *@
+                            @* <RadzenHtmlEditorStrikeThrough /> *@
+                            @* <RadzenHtmlEditorSeparator /> *@
+                            @* <RadzenHtmlEditorColor /> *@
+                            @* <RadzenHtmlEditorBackground /> *@
+                            @* <RadzenHtmlEditorRemoveFormat /> *@
+                        </RadzenHtmlEditor>
+                        
                         <ValidationMessage For="@(() => Product.Description)" />
                     </div>
 
@@ -180,7 +194,7 @@ else
     {
         IsProcessing = true;
         var file = e.File;
-        FileInfo fileInfo = new(file.Name);
+        System.IO.FileInfo fileInfo= new(file.Name);
         var newFileName = $"{Guid.NewGuid()}{fileInfo.Extension}";
         if(!Directory.Exists(_directoryPath))
         {
